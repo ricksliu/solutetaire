@@ -12,9 +12,9 @@ public class CardCollection {
     public CardCollection(boolean full) {
         // If requested to be full, adds every single card in
         if (full) {
-            for (char suit : new char[] {'h', 'd', 's', 'c'}) {
+            for (char suit : new char[] {'s', 'h', 'c', 'd'}) {
                 for (int rank = 1; rank <= 13; rank++) {
-                    cards.add(new Card(suit, rank, false));
+                    cards.add(new Card(suit, rank));
                 }
             }
         }
