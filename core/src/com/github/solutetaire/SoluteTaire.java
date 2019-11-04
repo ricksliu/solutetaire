@@ -273,6 +273,11 @@ public class SoluteTaire extends ApplicationAdapter {
 			if (tableau[i].getSize() == 0) {
 				batch.draw(cardSpaceImage, w * (1 + i) / 8 - cardW / 2, h / 2 - cardH / 2, cardW, cardH);
 			} else {
+				// Makes sure that last card is face up if not holding anything
+				if (!tableau[i].getLastCard().isFaceUp() & hand.getSize() == 0) {
+					tableau[i].getLastCard().flip();
+				}
+
 				for (int j = 0; j < tableau[i].getSize(); j++) {
 					drawCard(w * (1 + i) / 8 - cardW / 2, h / 2 - cardH / 2 - h / 20 * j, cardW, cardH, tableau[i].getCard(j));
 				}
@@ -286,8 +291,18 @@ public class SoluteTaire extends ApplicationAdapter {
 			}
 		}
 
-
 		batch.end();
+
+		// Checks if game is over
+		boolean victory = true;
+		for (int i = 0; i < 7; i++) {
+			if (tableau[i].getSize() > 0) {
+				victory = false;
+			}
+		}
+		if (victory) {
+			Gdx.app.exit();
+		}
 	}
 	
 	@Override
