@@ -100,7 +100,7 @@ public class SoluteTaire extends ApplicationAdapter {
 	@Override
 	public void render() {
 		// Clears screen
-		Gdx.gl.glClearColor(0.1f, 1, 0.1f, 1);
+		Gdx.gl.glClearColor(0.78f, 0.78f, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		// Updates camera
