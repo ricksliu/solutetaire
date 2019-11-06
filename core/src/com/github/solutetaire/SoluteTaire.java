@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
 
 public class SoluteTaire extends ApplicationAdapter {
+	private UI ui;
+
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private BitmapFont fontSmall;
@@ -23,28 +25,36 @@ public class SoluteTaire extends ApplicationAdapter {
 	private Texture spadeImage;
 	private Texture clubImage;
 
-	private Vector3 mouse = new Vector3();
+	private int timeElapsed;
+
+	private Vector3 mouse;
 	private int timeSinceClick;
+	private int clickDelay;  // Time between clicks registering
 
 	// Stores cards
 	private CardCollection stock;
 	private CardCollection waste;
-	private Foundation[] foundations = new Foundation[4];
-	private CardCollection[] tableau = new CardCollection[7];
+	private Foundation[] foundations;
+	private CardCollection[] tableau;
 	private CardCollection hand;  // Cards being dragged around by the mouse
-
 	private char[] handOrigin = new char[2];
 
 	public SoluteTaire() {
+		timeElapsed = 0;
+
+		mouse = new Vector3();
 		timeSinceClick = 0;
+		clickDelay = 10;
 
 		// Sets up all the stacks of cards
 		stock = new CardCollection(true);
 		waste = new CardCollection(false);
+		foundations = new Foundation[4];
 		foundations[0] = new Foundation('s');
 		foundations[1] = new Foundation('h');
 		foundations[2] = new Foundation('c');
 		foundations[3] = new Foundation('d');
+		tableau = new CardCollection[7];
 		for (int i = 0; i < 7; i++) {
 			tableau[i] = new CardCollection();
 		}
@@ -66,6 +76,8 @@ public class SoluteTaire extends ApplicationAdapter {
 
 	@Override
 	public void create() {
+		ui = new UI();
+
 		// Creates and sets camera
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1280, 720);
@@ -76,7 +88,7 @@ public class SoluteTaire extends ApplicationAdapter {
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("oswald.ttf"));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.color = Color.BLACK;
-		parameter.size = Gdx.graphics.getHeight() / 20;
+		parameter.size = ui.getFontSizes(0);
 		fontSmall = generator.generateFont(parameter);
 		generator.dispose();
 
@@ -92,7 +104,7 @@ public class SoluteTaire extends ApplicationAdapter {
 	@Override
 	public void render() {
 		// Clears screen
-		Gdx.gl.glClearColor(0.1f, 1, 0.1f, 1);
+		Gdx.gl.glClearColor(0.4f, 0.2f, 0.6f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		// Updates camera
@@ -101,12 +113,7 @@ public class SoluteTaire extends ApplicationAdapter {
 
 		batch.begin();
 
-		// Shorter names for dimensions of various things
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-		float cardW = w / 12;
-		float cardH = h / 4;
-
+		timeElapsed++;
 		if (timeSinceClick < 10) {
 			timeSinceClick++;
 		}
@@ -117,7 +124,7 @@ public class SoluteTaire extends ApplicationAdapter {
 			camera.unproject(mouse);
 
 			// If clicking on stock
-			if (isInside(mouse.x, mouse.y, w * 1 / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH) & timeSinceClick >= 10) {
+			if (isInside(mouse.x, mouse.y, ui.getStock()) & timeSinceClick >= clickDelay) {
 				// If stock is empty, take everything in waste, reverse it, and move it to stock
 				if (stock.getSize() == 0) {
 					waste.reverse();
@@ -131,43 +138,34 @@ public class SoluteTaire extends ApplicationAdapter {
 				}
 			}
 
-			// If clicking on waste and waste is not empty
-			if (isInside(mouse.x, mouse.y, w * 2 / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH) & waste.getSize() > 0) {
-				// If user is not already holding something
-				if (hand.getSize() == 0) {
-					hand.addCard(waste.popLastCard());
-					handOrigin[0] = 'w';
+			// If clicking on waste, waste is not empty, and user is not holding any cards
+			if (isInside(mouse.x, mouse.y, ui.getWaste()) & waste.getSize() > 0 & hand.getSize() == 0) {
+				hand.addCard(waste.popLastCard());
+				handOrigin[0] = 'w';
+			}
+
+			// If clicking on foundation, foundation is not empty, and user is not holding any cards
+			for (int i = 0; i < 4; i++) {
+				if (isInside(mouse.x, mouse.y, ui.getFoundations(i)) & foundations[i].getSize() > 0 & hand.getSize() == 0) {
+					hand.addCard(foundations[i].popLastCard());
+					handOrigin[0] = 'f';
+					handOrigin[1] = (char) i;
 				}
 			}
 
-			// If clicking on foundation and foundation is not empty
-			for (int i = 0; i < 4; i++) {
-				if (isInside(mouse.x, mouse.y, w * (4 + i) / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH) & foundations[i].getSize() > 0) {
-					// If user is not already holding something
-					if (hand.getSize() == 0) {
-						hand.addCard(foundations[i].popLastCard());
-						handOrigin[0] = 'f';
+			// If clicking on tableau, tableau is not empty, user is not holding any cards, and tableau card is face up
+			for (int i = 0; i < 7; i++) {
+				for (int j = 0; j < tableau[i].getSize(); j++) {
+					if (isInside(mouse.x, mouse.y, ui.getTableau(i, j)) & tableau[i].getSize() > 0 & hand.getSize() == 0 & tableau[i].getCard(j).isFaceUp()) {
+						hand.addCards(tableau[i].getCards(j));
+						tableau[i].clear(j);
+						handOrigin[0] = 't';
 						handOrigin[1] = (char) i;
 					}
 				}
 			}
 
-			// If clicking on tableau and tableau is not empty
-			for (int i = 0; i < 7; i++) {
-				for (int j = 0; j < tableau[i].getSize(); j++) {
-					if (isInside(mouse.x, mouse.y, w * (1 + i) / 8 - cardW / 2, h / 2 - cardH / 2 - h / 20 * j, cardW, cardH) & tableau[i].getSize() > 0) {
-						// If user is not already holding something and tableau card is face up
-						if (hand.getSize() == 0 & tableau[i].getCard(j).isFaceUp()) {
-							hand.addCards(tableau[i].getCards(j));
-							tableau[i].clear(j);
-							handOrigin[0] = 't';
-							handOrigin[1] = (char) i;
-						}
-					}
-				}
-			}
-
-			if (timeSinceClick >= 10) {
+			if (timeSinceClick >= clickDelay) {
 				timeSinceClick = 0;
 			}
 
@@ -177,8 +175,8 @@ public class SoluteTaire extends ApplicationAdapter {
 			while (hand.getSize() > 0) {
 				// Tries to place cards in foundation
 				for (int i = 0; i < 4; i++) {
-					// If hovering over foundation and is only holding one card
-					if (isInside(mouse.x, mouse.y, w * (4 + i) / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH) & hand.getSize() == 1) {
+					// If hovering over foundation and user is only holding one card
+					if (isInside(mouse.x, mouse.y, ui.getFoundations(i)) & hand.getSize() == 1) {
 						// If foundation is empty
 						if (foundations[i].getSize() == 0) {
 							// If card matches suit of foundation and is an ace
@@ -204,7 +202,7 @@ public class SoluteTaire extends ApplicationAdapter {
 				// Tries to place cards in tableau
 				for (int i = 0; i < 7; i++) {
 					// If hovering over last card in tableau
-					if (isInside(mouse.x, mouse.y, w * (1 + i) / 8 - cardW / 2, h / 2 - cardH / 2 - h / 20 * (tableau[i].getSize() - 1), cardW, cardH)) {
+					if (isInside(mouse.x, mouse.y, ui.getTableau(i, tableau[i].getSize() - 1))) {
 						// If tableau is empty
 						if (tableau[i].getSize() == 0) {
 							// If card is a king
@@ -247,39 +245,39 @@ public class SoluteTaire extends ApplicationAdapter {
 
 		// Draws stock
 		if (stock.getSize() == 0) {
-			batch.draw(cardSpaceImage, w * 1 / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH);
+			drawCard(ui.getStock());
 		} else {
-			drawCard(w * 1 / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH, stock.getLastCard());
+			drawCard(ui.getStock(), stock.getLastCard());
 		}
 
 		// Draws waste
 		if (waste.getSize() == 0) {
-			batch.draw(cardSpaceImage, w * 2 / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH);
+			drawCard(ui.getWaste());
 		} else {
-			drawCard(w * 2 / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH, waste.getLastCard());
+			drawCard(ui.getWaste(), waste.getLastCard());
 		}
 
 		// Draws foundations
 		for (int i = 0; i < 4; i++) {
 			if (foundations[i].getSize() == 0) {
-				batch.draw(cardSpaceImage, w * (4 + i) / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH);
+				drawCard(ui.getFoundations(i));
 			} else {
-				drawCard(w * (4 + i) / 8 - cardW / 2, h * 4 / 5 - cardH / 2, cardW, cardH, foundations[i].getLastCard());
+				drawCard(ui.getFoundations(i), foundations[i].getLastCard());
 			}
 		}
 
 		// Draws tableau
 		for (int i = 0; i < 7; i++) {
 			if (tableau[i].getSize() == 0) {
-				batch.draw(cardSpaceImage, w * (1 + i) / 8 - cardW / 2, h / 2 - cardH / 2, cardW, cardH);
+				drawCard(ui.getTableau(i));
 			} else {
-				// Makes sure that last card is face up if not holding anything
+				// Makes sure that the last card is face up if user is not holding anything
 				if (!tableau[i].getLastCard().isFaceUp() & hand.getSize() == 0) {
 					tableau[i].getLastCard().flip();
 				}
 
 				for (int j = 0; j < tableau[i].getSize(); j++) {
-					drawCard(w * (1 + i) / 8 - cardW / 2, h / 2 - cardH / 2 - h / 20 * j, cardW, cardH, tableau[i].getCard(j));
+					drawCard(ui.getTableau(i, j), tableau[i].getCard(j));
 				}
 			}
 		}
@@ -287,7 +285,7 @@ public class SoluteTaire extends ApplicationAdapter {
 		// Draws cards in hand
 		if (hand.getSize() > 0) {
 			for (int i = 0; i < hand.getSize(); i++) {
-				drawCard(mouse.x - cardW / 2, mouse.y - cardH / 2 - h / 20 * i, cardW, cardH, hand.getCard(i));
+				drawCard(ui.getCardDimensions(mouse.x, mouse.y), hand.getCard(i));
 			}
 		}
 
@@ -324,6 +322,11 @@ public class SoluteTaire extends ApplicationAdapter {
 		} else {
 			return false;
 		}
+	}
+
+	// Same as the original method but overloaded so the dimensions come from a single array
+	public boolean isInside(float x0, float y0, float[] dimensions) {
+		return isInside(x0, y0, dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
 	}
 
 	// Draws cards with given location, dimensions, suit, and card
@@ -367,6 +370,21 @@ public class SoluteTaire extends ApplicationAdapter {
 		} else {
 			batch.draw(cardBackImage, x, y, w, h);
 		}
+	}
+
+	// Same as the original method but overloaded so the dimensions come from a single array
+	public void drawCard(float[] dimensions, Card card) {
+		drawCard(dimensions[0], dimensions[1], dimensions[2], dimensions[3], card);
+	}
+
+	// Same as the original method but overloaded so a blank space is drawn if the card is omitted
+	public void drawCard(float x, float y, float w, float h) {
+		batch.draw(cardSpaceImage, x, y, w, h);
+	}
+
+	// Same as the previous method but overloaded so the dimensions come from a single array
+	public void drawCard(float[] dimensions) {
+		drawCard(dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
 	}
 
 	// Checks if two cards are opposite colours
