@@ -155,7 +155,8 @@ public class SoluteTaire extends ApplicationAdapter {
 
 			// If clicking on tableau, tableau is not empty, user is not holding any cards, and tableau card is face up
 			for (int i = 0; i < 7; i++) {
-				for (int j = 0; j < tableau[i].getSize(); j++) {
+				// For loop is reversed so cards on top are prioritized
+				for (int j = tableau[i].getSize() - 1; j >= 0; j--) {
 					if (isInside(mouse.x, mouse.y, ui.getTableau(i, j)) & tableau[i].getSize() > 0 & hand.getSize() == 0 & tableau[i].getCard(j).isFaceUp()) {
 						hand.addCards(tableau[i].getCards(j));
 						tableau[i].clear(j);
@@ -206,7 +207,7 @@ public class SoluteTaire extends ApplicationAdapter {
 						// If tableau is empty
 						if (tableau[i].getSize() == 0) {
 							// If card is a king
-							if (hand.getLastCard().getRank() == 13) {
+							if (hand.getCard(0).getRank() == 13) {
 								tableau[i].setCards(hand.getCards());
 								hand.clear();
 							}
@@ -285,7 +286,7 @@ public class SoluteTaire extends ApplicationAdapter {
 		// Draws cards in hand
 		if (hand.getSize() > 0) {
 			for (int i = 0; i < hand.getSize(); i++) {
-				drawCard(ui.getCardDimensions(mouse.x, mouse.y), hand.getCard(i));
+				drawCard(ui.getCardDimensions(mouse.x, mouse.y, i), hand.getCard(i));
 			}
 		}
 

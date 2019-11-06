@@ -88,6 +88,10 @@ public class UI {
         return new float[] {x - cardW / 2, y - cardH / 2, cardW, cardH};
     }
 
+    public float[] getCardDimensions(float x, float y, float i) {
+        return new float[] {x - cardW / 2, y - cardH / 2 - tableauVerticalSpacing * i, cardW, cardH};
+    }
+
     public int getFontSizes(int i) {
         return fontSizes[i];
     }
