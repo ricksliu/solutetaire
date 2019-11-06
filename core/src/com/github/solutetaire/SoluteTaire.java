@@ -25,9 +25,11 @@ public class SoluteTaire extends ApplicationAdapter {
 	private Texture spadeImage;
 	private Texture clubImage;
 
+	private int timeElapsed;
+
 	private Vector3 mouse;
 	private int timeSinceClick;
-	private int clickDelay;  // Until between clicks registering
+	private int clickDelay;  // Time between clicks registering
 
 	// Stores cards
 	private CardCollection stock;
@@ -38,6 +40,8 @@ public class SoluteTaire extends ApplicationAdapter {
 	private char[] handOrigin = new char[2];
 
 	public SoluteTaire() {
+		timeElapsed = 0;
+
 		mouse = new Vector3();
 		timeSinceClick = 0;
 		clickDelay = 10;
@@ -100,7 +104,7 @@ public class SoluteTaire extends ApplicationAdapter {
 	@Override
 	public void render() {
 		// Clears screen
-		Gdx.gl.glClearColor(0.78f, 0.78f, 1f, 1);
+		Gdx.gl.glClearColor(0.4f, 0.2f, 0.6f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		// Updates camera
@@ -109,6 +113,7 @@ public class SoluteTaire extends ApplicationAdapter {
 
 		batch.begin();
 
+		timeElapsed++;
 		if (timeSinceClick < 10) {
 			timeSinceClick++;
 		}
