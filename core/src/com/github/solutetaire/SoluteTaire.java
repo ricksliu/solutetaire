@@ -2,6 +2,7 @@ package com.github.solutetaire;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -17,8 +18,10 @@ public class SoluteTaire extends Game {
 
     public SpriteBatch batch;
     public BitmapFont fontSmall;
+    public BitmapFont fontMedium;
+    public BitmapFont fontLarge;
 
-	public SoluteTaire() {
+    public SoluteTaire() {
     }
 
 	@Override
@@ -37,9 +40,15 @@ public class SoluteTaire extends Game {
         parameter.color = Color.BLACK;
         parameter.size = ui.getFontSizes(0);
         fontSmall = generator.generateFont(parameter);
+        parameter.color = Color.WHITE;
+        parameter.size = ui.getFontSizes(1);
+        fontMedium = generator.generateFont(parameter);
+        parameter.color = Color.WHITE;
+        parameter.size = ui.getFontSizes(2);
+        fontLarge = generator.generateFont(parameter);
         generator.dispose();
 
-        setGameScreen();
+        setMenuScreen();
     }
 
 	@Override
@@ -51,6 +60,8 @@ public class SoluteTaire extends Game {
 	public void dispose() {
         batch.dispose();
         fontSmall.dispose();
+        fontMedium.dispose();
+        fontLarge.dispose();
 	}
 
     public void setMenuScreen() {
@@ -59,5 +70,29 @@ public class SoluteTaire extends Game {
 
     public void setGameScreen() {
         setScreen(new GameScreen(this));
+    }
+
+    // Checks if given coordinates are inside given location and dimensions
+    public boolean isInside(float x0, float y0, float x, float y, float w, float h) {
+        if (x <= x0 & x0 <= x + w & y <= y0 & y0 <= y + h) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Same as the original method but overloaded so the dimensions come from a single array
+    public boolean isInside(float x0, float y0, float[] dimensions) {
+        return isInside(x0, y0, dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
+    }
+
+    // Draws texture with given location and dimensions
+    public void draw(float x, float y, float w, float h, Texture image) {
+        batch.draw(image, x, y, w, h);
+    }
+
+    // Same as the previous method but overloaded so the dimensions come from a single array
+    public void draw(float[] dimensions, Texture image) {
+        draw(dimensions[0], dimensions[1], dimensions[2], dimensions[3], image);
     }
 }

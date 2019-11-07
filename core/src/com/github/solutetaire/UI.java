@@ -10,7 +10,13 @@ public class UI {
 
     private int[] fontSizes;  // Point sizes of small, medium, and large text
 
-    
+    // Dimensions of buttons
+    private float buttonW;
+    private float buttonH;
+
+    // Dimensions of menu screen
+    private float[] title;
+    private float[] playButton;
 
     // Dimensions of cards
     private float cardW;
@@ -28,7 +34,13 @@ public class UI {
         screenW = Gdx.graphics.getWidth();
         screenH = Gdx.graphics.getHeight();
 
-        fontSizes = new int[] {(int) screenW / 60, (int) screenW / 40, (int) screenW / 20};
+        fontSizes = new int[] {(int) screenW / 60, (int) screenW / 20, (int) screenW / 10};
+
+        buttonW = screenW / 4;
+        buttonH = screenH / 4;
+
+        title = new float[] {screenW * 1 / 24, screenH * 1 / 5};
+        playButton = new float[] {screenW * 13 / 24, screenH * 15 / 16};
 
         cardW = screenW / 12;
         cardH = screenH / 4;
@@ -46,6 +58,26 @@ public class UI {
 
     public float getScreenH() {
         return screenH;
+    }
+
+    public int getFontSizes(int i) {
+        return fontSizes[i];
+    }
+
+    public float getButtonW() {
+        return buttonW;
+    }
+
+    public float getButtonH() {
+        return buttonH;
+    }
+
+    public float[] getTitle() {
+        return title;
+    }
+
+    public float[] getPlayButton() {
+        return playButton;
     }
 
     public float getCardW() {
@@ -91,9 +123,5 @@ public class UI {
 
     public float[] getCardDimensions(float x, float y, float i) {
         return new float[] {x - cardW / 2, y - cardH / 2 - tableauVerticalSpacing * i, cardW, cardH};
-    }
-
-    public int getFontSizes(int i) {
-        return fontSizes[i];
     }
 }

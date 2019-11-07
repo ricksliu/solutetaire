@@ -1,15 +1,14 @@
 package com.github.solutetaire;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector3;
 
 public class MenuScreen implements Screen{
     final SoluteTaire game;
-    private Vector3 mouse;
 
     private OrthographicCamera camera;
 
@@ -23,10 +22,16 @@ public class MenuScreen implements Screen{
 
     @Override
     public void render(float delta) {
-        // If clicked, gets mouse position and checks for other actions
-        if(Gdx.input.isTouched()) {
-            mouse.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(mouse);
+        if (game.timeSinceClick < 10) {
+            game.timeSinceClick++;
+        }
+
+        // If clicked or pressed
+        if(Gdx.input.isTouched() | Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
+            if (game.timeSinceClick >= game.clickDelay) {
+                game.timeSinceClick = 0;
+                game.setGameScreen();
+            }
         }
 
         // Clears screen
@@ -38,6 +43,9 @@ public class MenuScreen implements Screen{
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
+
+        game.fontLarge.draw(game.batch, "SoluteTaire", game.ui.getTitle()[0], game.ui.getTitle()[1]);
+        game.fontMedium.draw(game.batch, "Press anything to begin.", game.ui.getPlayButton()[0], game.ui.getPlayButton()[1]);
 
         game.batch.end();
     }
