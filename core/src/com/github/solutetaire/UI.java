@@ -8,6 +8,10 @@ public class UI {
     private float screenW;
     private float screenH;
 
+    private int[] fontSizes;  // Point sizes of small, medium, and large text
+
+    
+
     // Dimensions of cards
     private float cardW;
     private float cardH;
@@ -17,14 +21,14 @@ public class UI {
     private float[] waste;
     private float[] foundations;  // Dimensions of left-most foundation
     private float[] tableau;  // Dimensions of left-most tableau
-
     private float tableauVerticalSpacing;
 
-    private int[] fontSizes;  // Point sizes of small, medium, and large text
 
     public UI() {
         screenW = Gdx.graphics.getWidth();
         screenH = Gdx.graphics.getHeight();
+
+        fontSizes = new int[] {(int) screenW / 60, (int) screenW / 40, (int) screenW / 20};
 
         cardW = screenW / 12;
         cardH = screenH / 4;
@@ -33,10 +37,7 @@ public class UI {
         waste = new float[] {screenW * 2 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2, cardW, cardH};
         foundations = new float[] {screenW * 4 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2, cardW, cardH};
         tableau = new float[] {screenW * 1 / 8 - cardW / 2, screenH * 1 / 2 - cardH / 2, cardW, cardH};
-
         tableauVerticalSpacing = screenH / 20;
-
-        fontSizes = new int[] {(int) screenW / 60, (int) screenW / 40, (int) screenW / 20};
     }
 
     public float getScreenW() {

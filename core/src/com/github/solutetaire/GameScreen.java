@@ -18,10 +18,15 @@ public class GameScreen implements Screen{
     private OrthographicCamera camera;
     private Texture cardSpaceImage;
     private Texture cardBackImage;
-    private Texture heartImage;
-    private Texture diamondImage;
     private Texture spadeImage;
+    private Texture heartImage;
     private Texture clubImage;
+    private Texture diamondImage;
+    private Texture cardSpaceSpadeImage;
+    private Texture cardSpaceHeartImage;
+    private Texture cardSpaceClubImage;
+    private Texture cardSpaceDiamondImage;
+
 
     // Stores cards
     private CardCollection stock;
@@ -42,10 +47,14 @@ public class GameScreen implements Screen{
         // Creates images
         cardSpaceImage = new Texture(Gdx.files.internal("cardSpace.png"));
         cardBackImage = new Texture(Gdx.files.internal("cardBack.png"));
-        heartImage = new Texture(Gdx.files.internal("heart.png"));
-        diamondImage = new Texture(Gdx.files.internal("diamond.png"));
         spadeImage = new Texture(Gdx.files.internal("spade.png"));
+        heartImage = new Texture(Gdx.files.internal("heart.png"));
         clubImage = new Texture(Gdx.files.internal("club.png"));
+        diamondImage = new Texture(Gdx.files.internal("diamond.png"));
+        cardSpaceSpadeImage = new Texture(Gdx.files.internal("cardSpaceSpade.png"));
+        cardSpaceHeartImage = new Texture(Gdx.files.internal("cardSpaceHeart.png"));
+        cardSpaceClubImage = new Texture(Gdx.files.internal("cardSpaceClub.png"));
+        cardSpaceDiamondImage = new Texture(Gdx.files.internal("cardSpaceDiamond.png"));
 
         // Sets up all the stacks of cards
         stock = new CardCollection(true);
@@ -220,14 +229,14 @@ public class GameScreen implements Screen{
 
         // Draws stock
         if (stock.getSize() == 0) {
-            drawCard(game.ui.getStock());
+            drawCard(game.ui.getStock(), cardSpaceImage);
         } else {
             drawCard(game.ui.getStock(), stock.getLastCard());
         }
 
         // Draws waste
         if (waste.getSize() == 0) {
-            drawCard(game.ui.getWaste());
+            drawCard(game.ui.getWaste(), cardSpaceImage);
         } else {
             drawCard(game.ui.getWaste(), waste.getLastCard());
         }
@@ -235,7 +244,21 @@ public class GameScreen implements Screen{
         // Draws foundations
         for (int i = 0; i < 4; i++) {
             if (foundations[i].getSize() == 0) {
-                drawCard(game.ui.getFoundations(i));
+                switch (i) {
+                    case 0:
+                        drawCard(game.ui.getFoundations(i), cardSpaceSpadeImage);
+                        break;
+                    case 1:
+                        drawCard(game.ui.getFoundations(i), cardSpaceHeartImage);
+                        break;
+                    case 2:
+                        drawCard(game.ui.getFoundations(i), cardSpaceClubImage);
+                        break;
+                    case 3:
+                        drawCard(game.ui.getFoundations(i), cardSpaceDiamondImage);
+                        break;
+                }
+
             } else {
                 drawCard(game.ui.getFoundations(i), foundations[i].getLastCard());
             }
@@ -244,7 +267,7 @@ public class GameScreen implements Screen{
         // Draws tableau
         for (int i = 0; i < 7; i++) {
             if (tableau[i].getSize() == 0) {
-                drawCard(game.ui.getTableau(i));
+                drawCard(game.ui.getTableau(i), cardSpaceImage);
             } else {
                 // Makes sure that the last card is face up if user is not holding anything
                 if (!tableau[i].getLastCard().isFaceUp() & hand.getSize() == 0) {
@@ -306,6 +329,10 @@ public class GameScreen implements Screen{
         diamondImage.dispose();
         spadeImage.dispose();
         clubImage.dispose();
+        cardSpaceSpadeImage.dispose();
+        cardSpaceHeartImage.dispose();
+        cardSpaceClubImage.dispose();
+        cardSpaceDiamondImage.dispose();
     }
 
     // Checks if given coordinates are inside given location and dimensions
@@ -370,14 +397,14 @@ public class GameScreen implements Screen{
         drawCard(dimensions[0], dimensions[1], dimensions[2], dimensions[3], card);
     }
 
-    // Same as the original method but overloaded so a blank space is drawn if the card is omitted
-    public void drawCard(float x, float y, float w, float h) {
-        game.batch.draw(cardSpaceImage, x, y, w, h);
+    // Same as the original method but overloaded so a texture is passed instead of a card
+    public void drawCard(float x, float y, float w, float h, Texture cardImage) {
+        game.batch.draw(cardImage, x, y, w, h);
     }
 
     // Same as the previous method but overloaded so the dimensions come from a single array
-    public void drawCard(float[] dimensions) {
-        drawCard(dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
+    public void drawCard(float[] dimensions, Texture cardImage) {
+        drawCard(dimensions[0], dimensions[1], dimensions[2], dimensions[3], cardImage);
     }
 
     // Checks if two cards are opposite colours
