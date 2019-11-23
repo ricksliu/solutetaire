@@ -5,14 +5,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 
-public class MenuScreen implements Screen{
+public class EndScreen implements Screen{
     final SoluteTaire game;
 
     private OrthographicCamera camera;
 
-    public MenuScreen(final SoluteTaire game) {
+    public EndScreen(final SoluteTaire game) {
         this.game = game;
 
         // Creates and sets camera
@@ -43,8 +42,8 @@ public class MenuScreen implements Screen{
 
         game.batch.begin();
 
-        game.fontLarge.draw(game.batch, "SoluteTaire", game.ui.getTitle()[0], game.ui.getTitle()[1]);
-        game.fontMedium.draw(game.batch, "Press anything to start.", game.ui.getPlayButton()[0], game.ui.getPlayButton()[1]);
+        game.fontLarge.draw(game.batch, "Victory", game.ui.getTitle()[0], game.ui.getTitle()[1]);
+        game.fontMedium.draw(game.batch, "Press anything to restart.", game.ui.getPlayButton()[0] - game.ui.getScreenW() / 25, game.ui.getPlayButton()[1]);
 
         game.batch.end();
     }

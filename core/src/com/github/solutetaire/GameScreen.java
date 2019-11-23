@@ -296,7 +296,7 @@ public class GameScreen implements Screen{
             }
         }
         if (victory) {
-            Gdx.app.exit();
+            game.setEndScreen();
         }
     }
 

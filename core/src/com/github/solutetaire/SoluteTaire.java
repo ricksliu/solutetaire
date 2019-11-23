@@ -65,11 +65,18 @@ public class SoluteTaire extends Game {
 	}
 
     public void setMenuScreen() {
+        timeSinceClick = 0;
         setScreen(new MenuScreen(this));
     }
 
     public void setGameScreen() {
+        timeSinceClick = 0;
         setScreen(new GameScreen(this));
+    }
+
+    public void setEndScreen() {
+        timeSinceClick = 0;
+        setScreen(new EndScreen(this));
     }
 
     // Checks if given coordinates are inside given location and dimensions
