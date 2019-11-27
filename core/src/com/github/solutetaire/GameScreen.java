@@ -86,6 +86,7 @@ public class GameScreen implements Screen{
     @Override
     public void render(float delta) {
         timeElapsed++;
+        game.ui.offsetDimensions(timeElapsed);
         if (game.timeSinceClick < 10) {
             game.timeSinceClick++;
         }

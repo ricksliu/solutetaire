@@ -1,6 +1,7 @@
 package com.github.solutetaire;
 
 import com.badlogic.gdx.Gdx;
+import java.lang.Math;
 
 // Stores values for the ui
 public class UI {
@@ -29,7 +30,6 @@ public class UI {
     private float[] tableau;  // Dimensions of left-most tableau
     private float tableauVerticalSpacing;
 
-
     public UI() {
         screenW = Gdx.graphics.getWidth();
         screenH = Gdx.graphics.getHeight();
@@ -49,7 +49,19 @@ public class UI {
         waste = new float[] {screenW * 2 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2, cardW, cardH};
         foundations = new float[] {screenW * 4 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2, cardW, cardH};
         tableau = new float[] {screenW * 1 / 8 - cardW / 2, screenH * 1 / 2 - cardH / 2, cardW, cardH};
-        tableauVerticalSpacing = screenH / 20;
+        tableauVerticalSpacing = screenH / 25;
+    }
+
+    public void offsetDimensions(int t) {
+        // stock[0] = screenW * 1 / 8 - cardW / 2;
+        stock[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 25f) * screenH / 150);
+        // waste[0] = screenW * 2 / 8 - cardW / 2;
+        waste[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 25f) * screenH / 150);
+        // foundations[0] = screenW * 4 / 8 - cardW / 2;
+        foundations[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH * 2 - screenH / 20 * t) + (float) (Math.sin(t / 25f + 1.047) * screenH / 150);
+        // tableau[0] = screenW * 1 / 8 - cardW / 2;
+        tableau[1] = screenH * 1 / 2 - cardH / 2 - Math.max(0, screenH * 3 - screenH / 20 * t) + (float) (Math.sin(t / 25f + 2.094) * screenH / 150);
+        // tableauVerticalSpacing = screenH / 20;
     }
 
     public float getScreenW() {
