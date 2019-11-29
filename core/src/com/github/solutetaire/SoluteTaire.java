@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Color;
@@ -17,6 +18,7 @@ public class SoluteTaire extends Game {
     public int clickDelay;  // Time between clicks registering
 
     public SpriteBatch batch;
+    public ShapeRenderer shape;
     public BitmapFont fontSmall;
     public BitmapFont fontMedium;
     public BitmapFont fontLarge;
@@ -33,6 +35,7 @@ public class SoluteTaire extends Game {
         clickDelay = 10;
 
         batch = new SpriteBatch();
+        shape = new ShapeRenderer();
 
         // Creates fonts
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("oswald.ttf"));
@@ -59,6 +62,7 @@ public class SoluteTaire extends Game {
 	@Override
 	public void dispose() {
         batch.dispose();
+        shape.dispose();
         fontSmall.dispose();
         fontMedium.dispose();
         fontLarge.dispose();

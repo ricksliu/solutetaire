@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 
 public class GameScreen implements Screen{
@@ -69,8 +70,9 @@ public class GameScreen implements Screen{
         }
         hand = new CardCollection(false);
 
-        // Adds cards to tableau
         stock.shuffle();
+
+        // Adds cards to tableau
         for (int i = 0; i < 7; i++) {
             for (int j = i; j < 7; j++) {
                 tableau[j].addCard(stock.popLastCard());
@@ -81,6 +83,11 @@ public class GameScreen implements Screen{
         for (int i = 0; i < 7; i++) {
             tableau[i].getLastCard().flip();
         }
+        tableau[0].addCard(new Card('s', 2));
+        tableau[0].addCard(new Card('h', 1));
+        tableau[0].addCard(new Card('d', 1));
+        tableau[0].addCard(new Card('c', 1));
+        tableau[0].addCard(new Card('s', 1));
     }
 
     @Override
@@ -92,7 +99,7 @@ public class GameScreen implements Screen{
         }
 
         // If clicked, gets mouse position and checks for other actions
-        if(Gdx.input.isTouched()) {
+        if (Gdx.input.isTouched()) {
             game.mouse.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(game.mouse);
 
@@ -143,7 +150,7 @@ public class GameScreen implements Screen{
                 game.timeSinceClick = 0;
             }
 
-        // If not clicked
+            // If not clicked
         } else {
             // If hand is not empty, tries to empty it
             while (hand.getSize() > 0) {
@@ -218,13 +225,43 @@ public class GameScreen implements Screen{
         }
 
         // Clears screen
-        Gdx.gl.glClearColor(0.4f, 0.2f, 0.6f, 1);
+        Gdx.gl.glClearColor(0.4f, 0.2f, 0.6f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Updates camera
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
+        game.shape.setProjectionMatrix(camera.combined);
 
+        // Draws background visuals
+        game.shape.begin(ShapeRenderer.ShapeType.Filled);
+
+        // Calculates a modifier to how pink the solution will be based on amount of water and indicator
+        float pinkModifier;
+        if (foundations[0].getSize() == 0) {
+            pinkModifier = 0;
+        } else {
+            pinkModifier = ((float) foundations[1].getSize()) / ((float) foundations[0].getSize());
+        }
+
+        // If no base or acid, make solution blue
+        if (foundations[2].getSize() + foundations[3].getSize() == 0) {
+            game.shape.setColor(new Color(0.5f, 0.25f, 1f, 1f));
+        // If more acid than base, make solution blue
+        } else if (foundations[2].getSize() < foundations[3].getSize()) {
+            game.shape.setColor(new Color(0.5f, 0.25f, 1f, 1f));
+        // If equal base and acid, make solution slightly pink
+        } else if (foundations[2].getSize() == foundations[3].getSize()) {
+            game.shape.setColor(new Color(0.5f + 0.25f * pinkModifier, 0.25f, 1f, 1f));
+        // If more base than acid, make solution pink
+        } else if (foundations[2].getSize() > foundations[3].getSize()) {
+            game.shape.setColor(new Color(0.5f + 0.5f * pinkModifier, 0.25f, 1f, 1f));
+        }
+
+        game.shape.rect(0, 0, game.ui.getScreenW(), game.ui.getScreenH() * foundations[0].getSize() / 13);
+        game.shape.end();
+
+        // Draws foreground visuals
         game.batch.begin();
 
         // Draws stock
