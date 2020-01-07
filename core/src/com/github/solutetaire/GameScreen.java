@@ -83,11 +83,6 @@ public class GameScreen implements Screen{
         for (int i = 0; i < 7; i++) {
             tableau[i].getLastCard().flip();
         }
-        tableau[0].addCard(new Card('s', 2));
-        tableau[0].addCard(new Card('h', 1));
-        tableau[0].addCard(new Card('d', 1));
-        tableau[0].addCard(new Card('c', 1));
-        tableau[0].addCard(new Card('s', 1));
     }
 
     @Override
