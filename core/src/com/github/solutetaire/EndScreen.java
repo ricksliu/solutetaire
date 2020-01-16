@@ -21,7 +21,7 @@ public class EndScreen implements Screen{
 
     @Override
     public void render(float delta) {
-        if (game.timeSinceClick < 10) {
+        if (game.timeSinceClick < game.clickDelay) {
             game.timeSinceClick++;
         }
 
