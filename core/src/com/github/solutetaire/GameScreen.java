@@ -15,6 +15,8 @@ import com.badlogic.gdx.math.Vector3;
 public class GameScreen implements Screen{
     final SoluteTaire game;
     private int timeElapsed;
+    private int animationTimeElapsed;
+    private int animationTime;
 
     private OrthographicCamera camera;
     private Texture cardSpaceImage;
@@ -39,6 +41,8 @@ public class GameScreen implements Screen{
     public GameScreen(final SoluteTaire game) {
         this.game = game;
         timeElapsed = 0;
+        animationTimeElapsed = 0;
+        animationTime = 10;
 
         // Creates and sets camera
         camera = new OrthographicCamera();
@@ -89,8 +93,12 @@ public class GameScreen implements Screen{
     public void render(float delta) {
         timeElapsed++;
         game.ui.offsetDimensions(timeElapsed);
-        if (game.timeSinceClick < 10) {
+        
+        if (game.timeSinceClick < game.clickDelay) {
             game.timeSinceClick++;
+        }
+        if (animationTimeElapsed < animationTime) {
+            animationTimeElapsed++;
         }
 
         // If clicked, gets mouse position and checks for other actions
