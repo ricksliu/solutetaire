@@ -54,13 +54,13 @@ public class UI {
 
     public void offsetDimensions(int t) {
         // stock[0] = screenW * 1 / 8 - cardW / 2;
-        stock[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 25f) * screenH / 150);
+        stock[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 50f) * screenH / 150);
         // waste[0] = screenW * 2 / 8 - cardW / 2;
-        waste[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 25f) * screenH / 150);
+        waste[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 50f) * screenH / 150);
         // foundations[0] = screenW * 4 / 8 - cardW / 2;
-        foundations[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH * 2 - screenH / 20 * t) + (float) (Math.sin(t / 25f + 1.047) * screenH / 150);
+        foundations[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH * 2 - screenH / 20 * t) + (float) (Math.sin(t / 50f + 1.047) * screenH / 150);
         // tableau[0] = screenW * 1 / 8 - cardW / 2;
-        tableau[1] = screenH * 1 / 2 - cardH / 2 - Math.max(0, screenH * 3 - screenH / 20 * t) + (float) (Math.sin(t / 25f + 2.094) * screenH / 150);
+        tableau[1] = screenH * 1 / 2 - cardH / 2 - Math.max(0, screenH * 3 - screenH / 20 * t) + (float) (Math.sin(t / 50f + 2.094) * screenH / 150);
         // tableauVerticalSpacing = screenH / 20;
     }
 
