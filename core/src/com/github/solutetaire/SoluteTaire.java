@@ -14,8 +14,8 @@ public class SoluteTaire extends Game {
     public UI ui;
 
     public Vector3 mouse;
-    public int timeSinceClick;
-    public int clickDelay;  // Time between clicks registering
+    public int timeSinceClick;  // Stores time since the last click
+    public int clickDelay;  // Delay between clicks registering
 
     public SpriteBatch batch;
     public ShapeRenderer shape;
@@ -40,12 +40,15 @@ public class SoluteTaire extends Game {
         // Creates fonts
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("oswald.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        // Small font
         parameter.color = Color.BLACK;
         parameter.size = ui.getFontSizes(0);
         fontSmall = generator.generateFont(parameter);
+        // Medium font
         parameter.color = Color.WHITE;
         parameter.size = ui.getFontSizes(1);
         fontMedium = generator.generateFont(parameter);
+        // Large font
         parameter.color = Color.WHITE;
         parameter.size = ui.getFontSizes(2);
         fontLarge = generator.generateFont(parameter);
@@ -83,6 +86,20 @@ public class SoluteTaire extends Game {
         setScreen(new EndScreen(this));
     }
 
+    public void runClickTimer() {
+        if (timeSinceClick < 10) {
+            timeSinceClick++;
+        }
+    }
+
+    public boolean canClick() {
+        if (timeSinceClick >= clickDelay) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // Checks if given coordinates are inside given location and dimensions
     public boolean isInside(float x0, float y0, float x, float y, float w, float h) {
         if (x <= x0 & x0 <= x + w & y <= y0 & y0 <= y + h) {
@@ -97,7 +114,7 @@ public class SoluteTaire extends Game {
         return isInside(x0, y0, dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
     }
 
-    // Draws texture with given location and dimensions
+    // Draws a texture with a given location and dimensions
     public void draw(float x, float y, float w, float h, Texture image) {
         batch.draw(image, x, y, w, h);
     }

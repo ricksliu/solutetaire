@@ -3,9 +3,9 @@ package com.github.solutetaire;
 import com.badlogic.gdx.Gdx;
 import java.lang.Math;
 
-// Stores values for the ui
+// Stores various values for the UI
 public class UI {
-    // Dimensions of screen, used as shortcuts
+    // Dimensions of the screen, used as shortcuts
     private float screenW;
     private float screenH;
 
@@ -15,7 +15,7 @@ public class UI {
     private float buttonW;
     private float buttonH;
 
-    // Dimensions of menu screen
+    // Dimensions of the menu screen
     private float[] title;
     private float[] playButton;
 

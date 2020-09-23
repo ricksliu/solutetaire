@@ -14,17 +14,19 @@ import com.badlogic.gdx.math.Vector3;
 
 public class GameScreen implements Screen{
     final SoluteTaire game;
-    private int timeElapsed;
-    private int animationTimeElapsed;
-    private int animationTime;
+    private int timeElapsed;  // Stores time since game started
+    private int animationTimeElapsed;  // Stores time since animation started
+    private int animationTime;  // Animation time
+    private boolean initialClick;  // Set to false in the middle of a click (when a click is being held)
 
     private OrthographicCamera camera;
+
     private Texture cardSpaceImage;
     private Texture cardBackImage;
-    private Texture spadeImage;
-    private Texture heartImage;
-    private Texture clubImage;
-    private Texture diamondImage;
+    private Texture cardSpadeImage;
+    private Texture cardHeartImage;
+    private Texture cardClubImage;
+    private Texture cardDiamondImage;
     private Texture cardSpaceSpadeImage;
     private Texture cardSpaceHeartImage;
     private Texture cardSpaceClubImage;
@@ -46,18 +48,19 @@ public class GameScreen implements Screen{
         timeElapsed = 0;
         animationTimeElapsed = 0;
         animationTime = 25;
+        initialClick = true;
 
-        // Creates and sets camera
+        // Sets camera
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1280, 720);
+        camera.setToOrtho(false, game.ui.getScreenW(), game.ui.getScreenH());
 
         // Creates images
         cardSpaceImage = new Texture(Gdx.files.internal("cardSpace.png"));
         cardBackImage = new Texture(Gdx.files.internal("cardBack.png"));
-        spadeImage = new Texture(Gdx.files.internal("spade.png"));
-        heartImage = new Texture(Gdx.files.internal("heart.png"));
-        clubImage = new Texture(Gdx.files.internal("club.png"));
-        diamondImage = new Texture(Gdx.files.internal("diamond.png"));
+        cardSpadeImage = new Texture(Gdx.files.internal("cardSpade.png"));
+        cardHeartImage = new Texture(Gdx.files.internal("cardHeart.png"));
+        cardClubImage = new Texture(Gdx.files.internal("cardClub.png"));
+        cardDiamondImage = new Texture(Gdx.files.internal("cardDiamond.png"));
         cardSpaceSpadeImage = new Texture(Gdx.files.internal("cardSpaceSpade.png"));
         cardSpaceHeartImage = new Texture(Gdx.files.internal("cardSpaceHeart.png"));
         cardSpaceClubImage = new Texture(Gdx.files.internal("cardSpaceClub.png"));
@@ -103,10 +106,9 @@ public class GameScreen implements Screen{
     public void render(float delta) {
         timeElapsed++;
         game.ui.offsetDimensions(timeElapsed);
-        
-        if (game.timeSinceClick < game.clickDelay) {
-            game.timeSinceClick++;
-        }
+
+        game.runClickTimer();
+
         if (animationTimeElapsed < animationTime) {
             animationTimeElapsed++;
         } else {
@@ -121,14 +123,14 @@ public class GameScreen implements Screen{
             camera.unproject(game.mouse);
 
             // If clicking on stock
-            if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getStock()) & game.timeSinceClick >= game.clickDelay) {
+            if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getStock()) & initialClick) {
                 // If stock is empty, take everything in waste, reverse it, and move it to stock
                 if (stock.getSize() == 0) {
                     waste.reverse();
                     stock.setCards(waste.getCards());
                     waste.clear();
                     stock.flipAll();
-                    // If stock is not empty, move the top card to waste
+                // If stock is not empty, move the top card to waste
                 } else {
                     waste.addCard(stock.popLastCard());
                     waste.getLastCard().flip();
@@ -169,11 +171,12 @@ public class GameScreen implements Screen{
                 }
             }
 
-            if (game.timeSinceClick >= game.clickDelay) {
+            if (game.canClick()) {
                 game.timeSinceClick = 0;
             }
+            initialClick = false;
 
-            // If not clicked
+        // If not clicked (mouse is not being held down)
         } else {
             // If hand is not empty, tries to empty it
             while (hand.getSize() > 0) {
@@ -188,7 +191,7 @@ public class GameScreen implements Screen{
                                 foundations[i].addCard(hand.popLastCard());
                                 animationTimeElapsed = 0;
                             }
-                            // If foundation is not empty
+                        // If foundation is not empty
                         } else {
                             // If card matches suit of foundation and is one bigger
                             if (hand.getLastCard().getSuit() == foundations[i].getSuit() & hand.getLastCard().getRank() == foundations[i].getLastCard().getRank() + 1) {
@@ -217,7 +220,7 @@ public class GameScreen implements Screen{
                                 hand.clear();
                                 animationTimeElapsed = 0;
                             }
-                            // If tableau is not empty
+                        // If tableau is not empty
                         } else {
                             // If first card in hand is opposite suit colour of last card in tableau and is one smaller
                             if (isOppositeColour(hand.getCard(0), tableau[i].getLastCard()) & hand.getCard(0).getRank() == tableau[i].getLastCard().getRank() - 1) {
@@ -252,6 +255,8 @@ public class GameScreen implements Screen{
                         break;
                 }
             }
+
+            initialClick = true;
         }
 
         // Clears screen
@@ -366,8 +371,8 @@ public class GameScreen implements Screen{
 
         // Checks if game is over
         boolean victory = true;
-        for (int i = 0; i < 7; i++) {
-            if (tableau[i].getSize() > 0) {
+        for (int i = 0; i < 4; i++) {
+            if (foundations[i].getSize() < 13) {
                 victory = false;
             }
         }
@@ -400,10 +405,10 @@ public class GameScreen implements Screen{
     public void dispose() {
         cardSpaceImage.dispose();
         cardBackImage.dispose();
-        heartImage.dispose();
-        diamondImage.dispose();
-        spadeImage.dispose();
-        clubImage.dispose();
+        cardHeartImage.dispose();
+        cardDiamondImage.dispose();
+        cardSpadeImage.dispose();
+        cardClubImage.dispose();
         cardSpaceSpadeImage.dispose();
         cardSpaceHeartImage.dispose();
         cardSpaceClubImage.dispose();
@@ -417,16 +422,16 @@ public class GameScreen implements Screen{
             // Draws card background with suit
             switch (card.getSuit()) {
                 case 's':
-                    game.batch.draw(spadeImage, x, y, w, h);
+                    game.batch.draw(cardSpadeImage, x, y, w, h);
                     break;
                 case 'h':
-                    game.batch.draw(heartImage, x, y, w, h);
+                    game.batch.draw(cardHeartImage, x, y, w, h);
                     break;
                 case 'c':
-                    game.batch.draw(clubImage, x, y, w, h);
+                    game.batch.draw(cardClubImage, x, y, w, h);
                     break;
                 case 'd':
-                    game.batch.draw(diamondImage, x, y, w, h);
+                    game.batch.draw(cardDiamondImage, x, y, w, h);
                     break;
             }
             // Draws rank on top

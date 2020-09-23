@@ -14,20 +14,18 @@ public class EndScreen implements Screen{
     public EndScreen(final SoluteTaire game) {
         this.game = game;
 
-        // Creates and sets camera
+        // Sets camera
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1280, 720);
+        camera.setToOrtho(false, game.ui.getScreenW(), game.ui.getScreenH());
     }
 
     @Override
     public void render(float delta) {
-        if (game.timeSinceClick < game.clickDelay) {
-            game.timeSinceClick++;
-        }
+        game.runClickTimer();
 
-        // If clicked or pressed
+        // If clicked or key pressed
         if(Gdx.input.isTouched() | Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
-            if (game.timeSinceClick >= game.clickDelay) {
+            if (game.canClick()) {
                 game.setGameScreen();
             }
         }
