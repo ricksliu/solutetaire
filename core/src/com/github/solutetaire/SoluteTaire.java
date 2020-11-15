@@ -14,8 +14,7 @@ public class SoluteTaire extends Game {
     public UI ui;
 
     public Vector3 mouse;
-    public int timeSinceClick;  // Stores time since the last click
-    public int clickDelay;  // Delay between clicks registering
+    public boolean initialClick;  // Set to false in the middle of a click (when a click is being held)
 
     public SpriteBatch batch;
     public ShapeRenderer shape;
@@ -31,8 +30,6 @@ public class SoluteTaire extends Game {
 	    ui = new UI();
 
         mouse = new Vector3();
-        timeSinceClick = 0;
-        clickDelay = 10;
 
         batch = new SpriteBatch();
         shape = new ShapeRenderer();
@@ -72,35 +69,21 @@ public class SoluteTaire extends Game {
 	}
 
     public void setMenuScreen() {
-        timeSinceClick = 0;
         setScreen(new MenuScreen(this));
+        initialClick = true;
     }
 
     public void setGameScreen() {
-        timeSinceClick = 0;
         setScreen(new GameScreen(this));
+        initialClick = true;
     }
 
     public void setEndScreen() {
-        timeSinceClick = 0;
         setScreen(new EndScreen(this));
+        initialClick = true;
     }
 
-    public void runClickTimer() {
-        if (timeSinceClick < 10) {
-            timeSinceClick++;
-        }
-    }
-
-    public boolean canClick() {
-        if (timeSinceClick >= clickDelay) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // Checks if given coordinates are inside given location and dimensions
+    // Checks if (x0, y0) is inside rectangle defined by point (x, y) and width and height w and h
     public boolean isInside(float x0, float y0, float x, float y, float w, float h) {
         if (x <= x0 & x0 <= x + w & y <= y0 & y0 <= y + h) {
             return true;
@@ -109,7 +92,7 @@ public class SoluteTaire extends Game {
         }
     }
 
-    // Draws a texture with a given location and dimensions
+    // Draws a texture with a given location, width and height
     public void draw(float x, float y, float w, float h, Texture image) {
         batch.draw(image, x, y, w, h);
     }

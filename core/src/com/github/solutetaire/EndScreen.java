@@ -21,13 +21,9 @@ public class EndScreen implements Screen{
 
     @Override
     public void render(float delta) {
-        game.runClickTimer();
-
         // If clicked or key pressed
         if(Gdx.input.isTouched() | Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
-            if (game.canClick()) {
-                game.setGameScreen();
-            }
+            game.setGameScreen();
         }
 
         // Clears screen

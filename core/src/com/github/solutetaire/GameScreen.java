@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.Vector3;
 public class GameScreen implements Screen{
     final SoluteTaire game;
     private int timeElapsed;  // Stores time since game started
-    private boolean initialClick;  // Set to false in the middle of a click (when a click is being held)
 
     private OrthographicCamera camera;
 
@@ -37,14 +36,14 @@ public class GameScreen implements Screen{
     private CardCollection[] tableau;
     private CardCollection hand;  // Cards being dragged around by the mouse
 
-    private char[] handOrigin = new char[2];
+    private char[] handOrigin = new char[2];  // Stores where cards in hand came from; letter, then integer as a char
     private boolean pouring;
     private float backgroundHeight;
 
     public GameScreen(final SoluteTaire game) {
         this.game = game;
         timeElapsed = 0;
-        initialClick = true;
+        game.initialClick = true;
 
         // Sets camera
         camera = new OrthographicCamera();
@@ -63,7 +62,7 @@ public class GameScreen implements Screen{
         cardSpaceDiamondImage = new Texture(Gdx.files.internal("cardSpaceDiamond.png"));
 
         // Sets up all the stacks of cards
-        stock = new CardCollection(true);
+        stock = new CardCollection(true);  // Initially puts all cards in stock
         waste = new CardCollection(false);
         foundations = new Foundation[4];
         foundations[0] = new Foundation('s');
@@ -78,14 +77,14 @@ public class GameScreen implements Screen{
 
         stock.shuffle();
 
-        // Adds cards to tableau
+        // Adds cards to tableau, removing them from stock
         for (int i = 0; i < 7; i++) {
             for (int j = i; j < 7; j++) {
                 tableau[j].addCard(stock.popLastCard());
             }
         }
 
-        // Flips last cards in tableau
+        // Flips last cards in tableau to be face up
         for (int i = 0; i < 7; i++) {
             tableau[i].getLastCard().flip();
         }
@@ -114,74 +113,116 @@ public class GameScreen implements Screen{
 
     @Override
     public void render(float delta) {
+        updateLogic();
+        updateGraphics();
+        drawGraphics();
+        checkVictory();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+    }
+
+    @Override
+    public void show() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void dispose() {
+        cardSpaceImage.dispose();
+        cardBackImage.dispose();
+        cardHeartImage.dispose();
+        cardDiamondImage.dispose();
+        cardSpadeImage.dispose();
+        cardClubImage.dispose();
+        cardSpaceSpadeImage.dispose();
+        cardSpaceHeartImage.dispose();
+        cardSpaceClubImage.dispose();
+        cardSpaceDiamondImage.dispose();
+    }
+
+    // Updates logic of game, such as where cards are located data-structure wise
+    private void updateLogic() {
         timeElapsed++;
 
-        game.runClickTimer();
-
-        // If clicked, gets mouse position and checks for other actions
+        // If mouse is being clicked/held down
         if (Gdx.input.isTouched()) {
             game.mouse.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(game.mouse);
 
-            // If clicking on stock
-            if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getStock()[0], game.ui.getStock()[1], game.ui.getCardW(), game.ui.getCardH()) & initialClick) {
-                // If stock is empty, takes everything in waste, reverses it, and moves it to stock
-                if (stock.getSize() == 0) {
-                    waste.reverse();
-                    stock.setCards(waste.getCards());
-                    waste.clear();
-                    stock.flipAll();
-                    for (int i = 0; i < stock.getSize(); i++) {
-                        stock.getCard(i).setNewCoordinates(game.ui.getStock());
+            // If initial click and hand is empty
+            if (hand.getSize() == 0 & game.initialClick) {
+
+                // If clicking on stock
+                if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getStock()[0], game.ui.getStock()[1], game.ui.getCardW(), game.ui.getCardH())) {
+                    // If stock is empty, takes everything in waste, reverses it, and moves it to stock
+                    if (stock.getSize() == 0) {
+                        waste.reverse();
+                        stock.setCards(waste.getCards());
+                        waste.clear();
+                        stock.flipAll();
+                        for (int i = 0; i < stock.getSize(); i++) {
+                            stock.getCard(i).setNewCoordinates(game.ui.getStock());
+                        }
+                        // If stock is not empty, moves top card to waste
+                    } else {
+                        waste.addCard(stock.popLastCard());
+                        waste.getLastCard().flip();
+                        waste.getLastCard().setNewCoordinates(game.ui.getWaste());
                     }
-                // If stock is not empty, moves top card to waste
-                } else {
-                    waste.addCard(stock.popLastCard());
-                    waste.getLastCard().flip();
-                    waste.getLastCard().setNewCoordinates(game.ui.getWaste());
                 }
-            }
 
-            // If clicking on waste, waste is not empty, and user is not holding any cards
-            if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getWaste()[0], game.ui.getWaste()[1], game.ui.getCardW(), game.ui.getCardH()) & waste.getSize() > 0 & hand.getSize() == 0) {
-                hand.addCard(waste.popLastCard());
-                handOrigin[0] = 'w';
-            }
-
-            // If clicking on foundation, foundation is not empty, and user is not holding any cards
-            for (int i = 0; i < 4; i++) {
-                if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getFoundations(i)[0], game.ui.getFoundations(i)[1], game.ui.getCardW(), game.ui.getCardH()) & foundations[i].getSize() > 0 & hand.getSize() == 0) {
-                    hand.addCard(foundations[i].popLastCard());
-                    hand.getLastCard().setOldCoordinates(game.ui.getFoundations(i));
-                    handOrigin[0] = 'f';
-                    handOrigin[1] = (char) i;
+                // If clicking on waste and waste is not empty
+                if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getWaste()[0], game.ui.getWaste()[1], game.ui.getCardW(), game.ui.getCardH()) & waste.getSize() > 0) {
+                    hand.addCard(waste.popLastCard());
+                    handOrigin[0] = 'w';
                 }
-            }
 
-            // If clicking on tableau, tableau is not empty, user is not holding any cards, and tableau card is face up
-            for (int i = 0; i < 7; i++) {
-                // For loop is reversed so cards on top are prioritized
-                for (int j = tableau[i].getSize() - 1; j >= 0; j--) {
-                    if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getTableau(i, j)[0], game.ui.getTableau(i, j)[1], game.ui.getCardW(), game.ui.getCardH()) & tableau[i].getSize() > 0 & hand.getSize() == 0) {
-                        if (tableau[i].getCard(j).isFaceUp()) {
-                            hand.addCards(tableau[i].getCards(j));
-                            tableau[i].clear(j);
-                            for (int k = j; j < hand.getSize(); j++) {
-                                hand.getCard(k).setOldCoordinates(game.ui.getTableau(i, j));
+                // If clicking on foundation and foundation is not empty
+                for (int i = 0; i < 4; i++) {
+                    if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getFoundations(i)[0], game.ui.getFoundations(i)[1], game.ui.getCardW(), game.ui.getCardH()) & foundations[i].getSize() > 0) {
+                        hand.addCard(foundations[i].popLastCard());
+                        hand.getLastCard().setOldCoordinates(game.ui.getFoundations(i));
+                        handOrigin[0] = 'f';
+                        handOrigin[1] = (char) i;
+                    }
+                }
+
+                // If clicking on tableau, tableau is not empty, and tableau card is face up
+                for (int i = 0; i < 7; i++) {
+                    // For loop is reversed so cards on top are prioritized
+                    for (int j = tableau[i].getSize() - 1; j >= 0; j--) {
+                        if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getTableau(i, j)[0], game.ui.getTableau(i, j)[1], game.ui.getCardW(), game.ui.getCardH()) & tableau[i].getSize() > 0) {
+                            if (tableau[i].getCard(j).isFaceUp()) {
+                                hand.addCards(tableau[i].getCards(j));
+                                tableau[i].clear(j);
+                                for (int k = j; j < hand.getSize(); j++) {
+                                    hand.getCard(k).setOldCoordinates(game.ui.getTableau(i, j));
+                                }
+                                handOrigin[0] = 't';
+                                handOrigin[1] = (char) i;
+                                break;
                             }
-                            handOrigin[0] = 't';
-                            handOrigin[1] = (char) i;
                         }
                     }
                 }
             }
 
-            if (game.canClick()) {
-                game.timeSinceClick = 0;
-            }
-            initialClick = false;
+            game.initialClick = false;
 
-        // If not clicked (mouse is not being held down)
+            // If not clicked (mouse is not being held down)
         } else {
             // If hand is not empty, tries to empty it
             while (hand.getSize() > 0) {
@@ -200,7 +241,7 @@ public class GameScreen implements Screen{
                                     pouring = true;
                                 }
                             }
-                        // If foundation is not empty
+                            // If foundation is not empty
                         } else {
                             // If card matches suit of foundation and is one bigger
                             if (hand.getLastCard().getSuit() == foundations[i].getSuit() & hand.getLastCard().getRank() == foundations[i].getLastCard().getRank() + 1) {
@@ -235,7 +276,7 @@ public class GameScreen implements Screen{
                                 }
                                 hand.clear();
                             }
-                        // If tableau is not empty
+                            // If tableau is not empty
                         } else {
                             // If first card in hand is opposite suit colour of last card in tableau and is one smaller
                             if (isOppositeColour(hand.getCard(0), tableau[i].getLastCard()) & hand.getCard(0).getRank() == tableau[i].getLastCard().getRank() - 1) {
@@ -278,18 +319,12 @@ public class GameScreen implements Screen{
                 }
             }
 
-            initialClick = true;
+            game.initialClick = true;
         }
+    }
 
-        // Clears screen
-        Gdx.gl.glClearColor(0.4f, 0.2f, 0.6f, 1f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Updates camera
-        camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
-        game.shape.setProjectionMatrix(camera.combined);
-
+    // Updates positions of graphics
+    private void updateGraphics() {
         // Sets new positions for cards in hand
         for (int i = 0; i < hand.getSize(); i++) {
             hand.getCard(i).setNewCoordinates(new float[] {game.mouse.x - game.ui.getCardW() / 2, game.mouse.y - game.ui.getCardH() / 2 - game.ui.getTableauVerticalSpacing() * i});
@@ -315,6 +350,18 @@ public class GameScreen implements Screen{
         for (int i = 0; i < hand.getSize(); i++) {
             hand.getCard(i).updateCoordinates();
         }
+    }
+
+    // Draws all graphics of game screen
+    private void drawGraphics() {
+        // Clears screen
+        Gdx.gl.glClearColor(0.4f, 0.2f, 0.6f, 1f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Updates camera
+        camera.update();
+        game.batch.setProjectionMatrix(camera.combined);
+        game.shape.setProjectionMatrix(camera.combined);
 
         // Draws background visuals
         game.shape.begin(ShapeRenderer.ShapeType.Filled);
@@ -333,13 +380,13 @@ public class GameScreen implements Screen{
         // If no base or acid, makes solution blue
         if (foundations[2].getSize() + foundations[3].getSize() == 0) {
             game.shape.setColor(new Color(0.5f, 0.25f, 1f, 1f));
-        // If more acid than base, makes solution blue
+            // If more acid than base, makes solution blue
         } else if (foundations[2].getSize() < foundations[3].getSize()) {
             game.shape.setColor(new Color(0.5f, 0.25f, 1f, 1f));
-        // If equal base and acid, makes solution slightly pink
+            // If equal base and acid, makes solution slightly pink
         } else if (foundations[2].getSize() == foundations[3].getSize()) {
             game.shape.setColor(new Color(0.5f + 0.25f * pinkModifier, 0.25f, 1f, 1f));
-        // If more base than acid, makes solution pink
+            // If more base than acid, makes solution pink
         } else if (foundations[2].getSize() > foundations[3].getSize()) {
             game.shape.setColor(new Color(0.5f + 0.5f * pinkModifier, 0.25f, 1f, 1f));
         }
@@ -427,8 +474,10 @@ public class GameScreen implements Screen{
         }
 
         game.batch.end();
+    }
 
-        // Checks if game is over
+    // Checks if game is over
+    private void checkVictory() {
         boolean victory = true;
         for (int i = 0; i < 4; i++) {
             if (foundations[i].getSize() < 13) {
@@ -440,42 +489,8 @@ public class GameScreen implements Screen{
         }
     }
 
-    @Override
-    public void resize(int width, int height) {
-    }
-
-    @Override
-    public void show() {
-    }
-
-    @Override
-    public void hide() {
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void dispose() {
-        cardSpaceImage.dispose();
-        cardBackImage.dispose();
-        cardHeartImage.dispose();
-        cardDiamondImage.dispose();
-        cardSpadeImage.dispose();
-        cardClubImage.dispose();
-        cardSpaceSpadeImage.dispose();
-        cardSpaceHeartImage.dispose();
-        cardSpaceClubImage.dispose();
-        cardSpaceDiamondImage.dispose();
-    }
-
     // Draws card with given location, dimensions, suit, and card
-    public void drawCard(Card card) {
+    private void drawCard(Card card) {
         float x = card.getCoordinates()[0];
         float y = card.getCoordinates()[1];
         float w = game.ui.getCardW();
@@ -523,7 +538,7 @@ public class GameScreen implements Screen{
     }
 
     // Checks if two cards are opposite colours
-    public boolean isOppositeColour(Card a, Card b) {
+    private boolean isOppositeColour(Card a, Card b) {
         if (a.getSuit() == 's' | a.getSuit() == 'c') {
             if (b.getSuit() == 'h' | b.getSuit() == 'd') {
                 return true;
