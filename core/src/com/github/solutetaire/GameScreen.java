@@ -38,6 +38,7 @@ public class GameScreen implements Screen{
     private CardCollection hand;  // Cards being dragged around by the mouse
 
     private char[] handOrigin = new char[2];
+    private boolean pouring;
     private float backgroundHeight;
 
     public GameScreen(final SoluteTaire game) {
@@ -84,17 +85,6 @@ public class GameScreen implements Screen{
             }
         }
 
-        /*
-        tableau[0].addCard(new Card('s', 1));
-        tableau[1].addCard(new Card('d', 1));
-        tableau[2].addCard(new Card('c', 1));
-        tableau[3].addCard(new Card('h', 1));
-        */
-
-        tableau[0].addCard(new Card('s', 3));
-        tableau[0].addCard(new Card('s', 2));
-        tableau[0].addCard(new Card('s', 1));
-
         // Flips last cards in tableau
         for (int i = 0; i < 7; i++) {
             tableau[i].getLastCard().flip();
@@ -118,6 +108,7 @@ public class GameScreen implements Screen{
             }
         }
 
+        pouring = false;
         backgroundHeight = 0;
     }
 
@@ -204,6 +195,10 @@ public class GameScreen implements Screen{
                             if (hand.getLastCard().getSuit() == foundations[i].getSuit() & hand.getLastCard().getRank() == 1) {
                                 foundations[i].addCard(hand.popLastCard());
                                 foundations[i].getLastCard().setNewCoordinates(game.ui.getFoundations(i));
+                                // Starts pouring animation if card was water
+                                if (i == 0) {
+                                    pouring = true;
+                                }
                             }
                         // If foundation is not empty
                         } else {
@@ -211,6 +206,10 @@ public class GameScreen implements Screen{
                             if (hand.getLastCard().getSuit() == foundations[i].getSuit() & hand.getLastCard().getRank() == foundations[i].getLastCard().getRank() + 1) {
                                 foundations[i].addCard(hand.popLastCard());
                                 foundations[i].getLastCard().setNewCoordinates(game.ui.getFoundations(i));
+                                // Starts pouring animation if card was water
+                                if (i == 0) {
+                                    pouring = true;
+                                }
                             }
                         }
                     }
@@ -265,6 +264,9 @@ public class GameScreen implements Screen{
                     case 'f':
                         foundations[(int) handOrigin[1]].addCard(hand.popLastCard());
                         foundations[(int) handOrigin[1]].getLastCard().setNewCoordinates(game.ui.getFoundations((int) handOrigin[1]));
+                        if ((int) handOrigin[1] == 0) {
+                            pouring = true;
+                        }
                         break;
                     case 't':
                         tableau[(int) handOrigin[1]].addCards(hand.getCards());
@@ -341,9 +343,23 @@ public class GameScreen implements Screen{
         } else if (foundations[2].getSize() > foundations[3].getSize()) {
             game.shape.setColor(new Color(0.5f + 0.5f * pinkModifier, 0.25f, 1f, 1f));
         }
+
+        // Draws the solution
         game.shape.rect(0, 0, game.ui.getScreenW(), backgroundHeight);
-        game.shape.setColor(new Color(0.5f, 0.25f, 1f, 1f));
-        game.shape.rect(game.ui.getScreenW() * 7 / 15, 0, game.ui.getScreenW() / 15, game.ui.getScreenH());
+
+        // Draws a pouring animation
+        if (pouring) {
+            // If background height animation is 95% done, stops pouring animation
+            if (game.ui.getScreenH() * foundations[0].getSize() / 13f - backgroundHeight < 0.05 * game.ui.getScreenH() * foundations[0].getSize() / 13f) {
+                pouring = false;
+            } else {
+                game.shape.setColor(new Color(0.5f, 0.25f, 1f, 1f));
+                game.shape.rect(game.ui.getScreenW() * 7 / 15, 0, game.ui.getScreenW() / 15, game.ui.getScreenH());
+            }
+        }
+
+        System.out.print(game.ui.getScreenH() - backgroundHeight);
+        System.out.println(0.05 * game.ui.getScreenH() * foundations[0].getSize() / 13f);
 
         game.shape.end();
 
