@@ -36,10 +36,8 @@ public class MenuScreen implements Screen{
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-
         game.fontLarge.draw(game.batch, "SoluteTaire", game.ui.getTitle()[0], game.ui.getTitle()[1]);
         game.fontMedium.draw(game.batch, "Press anything to start.", game.ui.getPlayButton()[0], game.ui.getPlayButton()[1]);
-
         game.batch.end();
     }
 

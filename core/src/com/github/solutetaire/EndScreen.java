@@ -35,10 +35,8 @@ public class EndScreen implements Screen{
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-
         game.fontLarge.draw(game.batch, "Victory", game.ui.getTitle()[0], game.ui.getTitle()[1]);
-        game.fontMedium.draw(game.batch, "Press anything to restart.", game.ui.getPlayButton()[0] - game.ui.getScreenW() / 25, game.ui.getPlayButton()[1]);
-
+        game.fontMedium.draw(game.batch, "Press anything to restart.", game.ui.getPlayButton()[0] - game.ui.getScreenW() / 36, game.ui.getPlayButton()[1]);
         game.batch.end();
     }
 

@@ -2,6 +2,7 @@ package com.github.solutetaire;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -21,6 +22,10 @@ public class SoluteTaire extends Game {
     public BitmapFont fontSmall;
     public BitmapFont fontMedium;
     public BitmapFont fontLarge;
+    public Sound newGameSound;
+    public Sound cardUpSound;
+    public Sound cardDownSound;
+    public Sound victorySound;
 
     public SoluteTaire() {
     }
@@ -51,6 +56,12 @@ public class SoluteTaire extends Game {
         fontLarge = generator.generateFont(parameter);
         generator.dispose();
 
+        // Creates sounds
+        newGameSound = Gdx.audio.newSound(Gdx.files.internal("newGameSound.ogg"));
+        cardUpSound = Gdx.audio.newSound(Gdx.files.internal("cardUpSound.ogg"));
+        cardDownSound = Gdx.audio.newSound(Gdx.files.internal("cardDownSound.ogg"));
+        victorySound = Gdx.audio.newSound(Gdx.files.internal("newGameSound.ogg"));
+
         setMenuScreen();
     }
 
@@ -66,6 +77,10 @@ public class SoluteTaire extends Game {
         fontSmall.dispose();
         fontMedium.dispose();
         fontLarge.dispose();
+        newGameSound.dispose();
+        cardUpSound.dispose();
+        cardDownSound.dispose();
+        victorySound.dispose();
 	}
 
     public void setMenuScreen() {
@@ -75,11 +90,13 @@ public class SoluteTaire extends Game {
 
     public void setGameScreen() {
         setScreen(new GameScreen(this));
+        newGameSound.play();
         initialClick = true;
     }
 
     public void setEndScreen() {
         setScreen(new EndScreen(this));
+        victorySound.play();
         initialClick = true;
     }
 

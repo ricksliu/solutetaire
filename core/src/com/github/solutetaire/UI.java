@@ -34,13 +34,13 @@ public class UI {
         screenW = Gdx.graphics.getWidth();
         screenH = Gdx.graphics.getHeight();
 
-        fontSizes = new int[] {(int) screenW / 60, (int) screenW / 20, (int) screenW / 10};
+        fontSizes = new int[] {(int) screenW / 60, (int) screenW / 24, (int) screenW / 12};
 
         buttonW = screenW / 4;
         buttonH = screenH / 4;
 
         title = new float[] {screenW * 1 / 24, screenH * 1 / 5};
-        playButton = new float[] {screenW * 13 / 24, screenH * 15 / 16};
+        playButton = new float[] {screenW * 15 / 24, screenH * 15 / 16};
 
         cardW = screenW / 12;
         cardH = screenH / 4;

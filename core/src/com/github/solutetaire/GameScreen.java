@@ -176,11 +176,13 @@ public class GameScreen implements Screen{
                         for (int i = 0; i < stock.getSize(); i++) {
                             stock.getCard(i).setNewCoordinates(game.ui.getStock());
                         }
-                        // If stock is not empty, moves top card to waste
+                        game.cardDownSound.play();
+                    // If stock is not empty, moves top card to waste
                     } else {
                         waste.addCard(stock.popLastCard());
                         waste.getLastCard().flip();
                         waste.getLastCard().setNewCoordinates(game.ui.getWaste());
+                        game.cardUpSound.play();
                     }
                 }
 
@@ -188,15 +190,16 @@ public class GameScreen implements Screen{
                 if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getWaste()[0], game.ui.getWaste()[1], game.ui.getCardW(), game.ui.getCardH()) & waste.getSize() > 0) {
                     hand.addCard(waste.popLastCard());
                     handOrigin[0] = 'w';
+                    game.cardUpSound.play();
                 }
 
                 // If clicking on foundation and foundation is not empty
                 for (int i = 0; i < 4; i++) {
                     if (game.isInside(game.mouse.x, game.mouse.y, game.ui.getFoundations(i)[0], game.ui.getFoundations(i)[1], game.ui.getCardW(), game.ui.getCardH()) & foundations[i].getSize() > 0) {
                         hand.addCard(foundations[i].popLastCard());
-                        hand.getLastCard().setOldCoordinates(game.ui.getFoundations(i));
                         handOrigin[0] = 'f';
                         handOrigin[1] = (char) i;
+                        game.cardUpSound.play();
                     }
                 }
 
@@ -208,11 +211,9 @@ public class GameScreen implements Screen{
                             if (tableau[i].getCard(j).isFaceUp()) {
                                 hand.addCards(tableau[i].getCards(j));
                                 tableau[i].clear(j);
-                                for (int k = j; j < hand.getSize(); j++) {
-                                    hand.getCard(k).setOldCoordinates(game.ui.getTableau(i, j));
-                                }
                                 handOrigin[0] = 't';
                                 handOrigin[1] = (char) i;
+                                game.cardUpSound.play();
                                 break;
                             }
                         }
@@ -222,7 +223,7 @@ public class GameScreen implements Screen{
 
             game.initialClick = false;
 
-            // If not clicked (mouse is not being held down)
+        // If not clicked (mouse is not being held down)
         } else {
             // If hand is not empty, tries to empty it
             while (hand.getSize() > 0) {
@@ -240,8 +241,9 @@ public class GameScreen implements Screen{
                                 if (i == 0) {
                                     pouring = true;
                                 }
+                                game.cardDownSound.play();
                             }
-                            // If foundation is not empty
+                        // If foundation is not empty
                         } else {
                             // If card matches suit of foundation and is one bigger
                             if (hand.getLastCard().getSuit() == foundations[i].getSuit() & hand.getLastCard().getRank() == foundations[i].getLastCard().getRank() + 1) {
@@ -251,6 +253,7 @@ public class GameScreen implements Screen{
                                 if (i == 0) {
                                     pouring = true;
                                 }
+                                game.cardDownSound.play();
                             }
                         }
                     }
@@ -275,8 +278,9 @@ public class GameScreen implements Screen{
                                     tableau[i].getCard(j).setNewCoordinates(game.ui.getTableau(i, j));
                                 }
                                 hand.clear();
+                                game.cardDownSound.play();
                             }
-                            // If tableau is not empty
+                        // If tableau is not empty
                         } else {
                             // If first card in hand is opposite suit colour of last card in tableau and is one smaller
                             if (isOppositeColour(hand.getCard(0), tableau[i].getLastCard()) & hand.getCard(0).getRank() == tableau[i].getLastCard().getRank() - 1) {
@@ -285,6 +289,7 @@ public class GameScreen implements Screen{
                                     tableau[i].getCard(j).setNewCoordinates(game.ui.getTableau(i, j));
                                 }
                                 hand.clear();
+                                game.cardDownSound.play();
                             }
                         }
                     }
@@ -301,6 +306,7 @@ public class GameScreen implements Screen{
                     case 'w':
                         waste.addCard(hand.popLastCard());
                         waste.getLastCard().setNewCoordinates(game.ui.getWaste());
+                        game.cardDownSound.play();
                         break;
                     case 'f':
                         foundations[(int) handOrigin[1]].addCard(hand.popLastCard());
@@ -308,6 +314,7 @@ public class GameScreen implements Screen{
                         if ((int) handOrigin[1] == 0) {
                             pouring = true;
                         }
+                        game.cardDownSound.play();
                         break;
                     case 't':
                         tableau[(int) handOrigin[1]].addCards(hand.getCards());
@@ -315,6 +322,7 @@ public class GameScreen implements Screen{
                         for (int i = 0; i < tableau[(int) handOrigin[1]].getSize(); i++) {
                             tableau[(int) handOrigin[1]].getCard(i).setNewCoordinates(game.ui.getTableau((int) handOrigin[1], i));
                         }
+                        game.cardDownSound.play();
                         break;
                 }
             }
@@ -404,9 +412,6 @@ public class GameScreen implements Screen{
                 game.shape.rect(game.ui.getScreenW() * 7 / 15, 0, game.ui.getScreenW() / 15, game.ui.getScreenH());
             }
         }
-
-        System.out.print(game.ui.getScreenH() - backgroundHeight);
-        System.out.println(0.05 * game.ui.getScreenH() * foundations[0].getSize() / 13f);
 
         game.shape.end();
 
