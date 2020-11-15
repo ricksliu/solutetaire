@@ -109,18 +109,8 @@ public class SoluteTaire extends Game {
         }
     }
 
-    // Same as the original method but overloaded so the dimensions come from a single array
-    public boolean isInside(float x0, float y0, float[] dimensions) {
-        return isInside(x0, y0, dimensions[0], dimensions[1], dimensions[2], dimensions[3]);
-    }
-
     // Draws a texture with a given location and dimensions
     public void draw(float x, float y, float w, float h, Texture image) {
         batch.draw(image, x, y, w, h);
-    }
-
-    // Same as the previous method but overloaded so the dimensions come from a single array
-    public void draw(float[] dimensions, Texture image) {
-        draw(dimensions[0], dimensions[1], dimensions[2], dimensions[3], image);
     }
 }

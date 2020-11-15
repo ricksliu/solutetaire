@@ -8,8 +8,9 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "SoluteTaire";
-		config.width = 1280;
-		config.height = 720;
+		config.fullscreen = true;
+		config.width = LwjglApplicationConfiguration.getDesktopDisplayMode().width;
+		config.height = LwjglApplicationConfiguration.getDesktopDisplayMode().height;
 		new LwjglApplication(new SoluteTaire(), config);
 	}
 }

@@ -2,6 +2,7 @@ package com.github.solutetaire;
 
 import java.util.ArrayList;
 
+// Inherits from CardCollection and stores a designated suit
 public class Foundation extends CardCollection {
     private ArrayList<Card> cards = new ArrayList<>();
     private char suit;

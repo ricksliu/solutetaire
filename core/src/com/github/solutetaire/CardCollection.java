@@ -50,6 +50,7 @@ public class CardCollection {
         return cards;
     }
 
+    // Returns ArrayList of all cards from index and on
     public ArrayList<Card> getCards(int index) {
         ArrayList<Card> cardsSubset = new ArrayList<>();
         for (int i = index; i < cards.size(); i++) {
@@ -58,12 +59,14 @@ public class CardCollection {
         return cardsSubset;
     }
 
+    // Accepts ArrayList of cards to add
     public void addCards(ArrayList<Card> newCards) {
         for (int i = 0; i < newCards.size(); i++) {
             cards.add(newCards.get(i));
         }
     }
 
+    // Accepts ArrayList of cards to completely replace current cards with
     public void setCards(ArrayList<Card> newCards) {
         cards = new ArrayList<>(newCards);
     }
@@ -72,6 +75,7 @@ public class CardCollection {
         cards.clear();
     }
 
+    // Removes all cards from index and on
     public void clear(int index) {
         int originalSize = cards.size();
         for (int i = 0; i < originalSize - index; i++) {

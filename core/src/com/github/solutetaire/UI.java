@@ -45,23 +45,11 @@ public class UI {
         cardW = screenW / 12;
         cardH = screenH / 4;
 
-        stock = new float[] {screenW * 1 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2, cardW, cardH};
-        waste = new float[] {screenW * 2 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2, cardW, cardH};
-        foundations = new float[] {screenW * 4 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2, cardW, cardH};
-        tableau = new float[] {screenW * 1 / 8 - cardW / 2, screenH * 1 / 2 - cardH / 2, cardW, cardH};
+        stock = new float[] {screenW * 1 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2};
+        waste = new float[] {screenW * 2 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2};
+        foundations = new float[] {screenW * 4 / 8 - cardW / 2, screenH * 4 / 5 - cardH / 2};
+        tableau = new float[] {screenW * 1 / 8 - cardW / 2, screenH * 1 / 2 - cardH / 2};
         tableauVerticalSpacing = screenH / 25;
-    }
-
-    public void offsetDimensions(int t) {
-        // stock[0] = screenW * 1 / 8 - cardW / 2;
-        stock[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 50f) * screenH / 150);
-        // waste[0] = screenW * 2 / 8 - cardW / 2;
-        waste[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH - screenH / 20 * t) + (float) (Math.sin(t / 50f) * screenH / 150);
-        // foundations[0] = screenW * 4 / 8 - cardW / 2;
-        foundations[1] = screenH * 4 / 5 - cardH / 2 - Math.max(0, screenH * 2 - screenH / 20 * t) + (float) (Math.sin(t / 50f + 1.047) * screenH / 150);
-        // tableau[0] = screenW * 1 / 8 - cardW / 2;
-        tableau[1] = screenH * 1 / 2 - cardH / 2 - Math.max(0, screenH * 3 - screenH / 20 * t) + (float) (Math.sin(t / 50f + 2.094) * screenH / 150);
-        // tableauVerticalSpacing = screenH / 20;
     }
 
     public float getScreenW() {
@@ -112,28 +100,26 @@ public class UI {
         return foundations;
     }
 
+    // i is used to offset horizontally
     public float[] getFoundations(float i) {
-        return new float[] {foundations[0] + screenW * i / 8, foundations[1], foundations[2], foundations[3]};
+        return new float[] {foundations[0] + screenW * i / 8, foundations[1]};
     }
 
     public float[] getTableau() {
         return tableau;
     }
 
+    public float getTableauVerticalSpacing() {
+        return tableauVerticalSpacing;
+    }
+
+    // i is used to offset horizontally
     public float[] getTableau(float i) {
-        return new float[] {tableau[0] + screenW * i / 8, tableau[1], tableau[2], tableau[3]};
+        return new float[] {tableau[0] + screenW * i / 8, tableau[1]};
     }
 
+    // i is used to offset horizontally, j is used to offset stacks of cards
     public float[] getTableau(float i, float j) {
-        return new float[] {tableau[0] + screenW * i / 8, tableau[1] - tableauVerticalSpacing * j, tableau[2], tableau[3]};
-    }
-
-    // Returns dimensions that would draw a card centered around the given point
-    public float[] getCardDimensions(float x, float y) {
-        return new float[] {x - cardW / 2, y - cardH / 2, cardW, cardH};
-    }
-
-    public float[] getCardDimensions(float x, float y, float i) {
-        return new float[] {x - cardW / 2, y - cardH / 2 - tableauVerticalSpacing * i, cardW, cardH};
+        return new float[] {tableau[0] + screenW * i / 8, tableau[1] - tableauVerticalSpacing * j};
     }
 }
