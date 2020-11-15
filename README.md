@@ -1,2 +1,2 @@
 # solutetaire
-A chemistry-themed Solitaire clone, made in Java with the libGDX framework.
+A chemistry-themed Solitaire clone made with the libGDX framework.
