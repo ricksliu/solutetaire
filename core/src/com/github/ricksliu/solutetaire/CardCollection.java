@@ -1,4 +1,4 @@
-package com.github.solutetaire;
+package com.github.ricksliu.solutetaire;
 
 import java.util.ArrayList;
 import java.util.Collections;

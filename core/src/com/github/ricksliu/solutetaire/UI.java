@@ -1,4 +1,4 @@
-package com.github.solutetaire;
+package com.github.ricksliu.solutetaire;
 
 import com.badlogic.gdx.Gdx;
 import java.lang.Math;

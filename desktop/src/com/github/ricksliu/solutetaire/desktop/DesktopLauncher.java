@@ -1,8 +1,8 @@
-package com.github.solutetaire.desktop;
+package com.github.ricksliu.solutetaire.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.github.solutetaire.SoluteTaire;
+import com.github.ricksliu.solutetaire.SoluteTaire;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
