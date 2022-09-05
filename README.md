@@ -4,7 +4,7 @@ A clone of the game Solitaire with chemistry-themed graphics. Made with Java and
 
 ## Instructions
 
-Download and run the .jar release.
+1. Download and run the .jar release.
 
 ## Video Showcase
 
