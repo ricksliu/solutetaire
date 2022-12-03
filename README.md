@@ -1,6 +1,6 @@
 # solutetaire
 
-Chemistry-themed Solitaire clone. Uses libGDX.
+Chemistry-themed Solitaire clone. Uses Java with libGDX.
 
 ## Demo Video
 
